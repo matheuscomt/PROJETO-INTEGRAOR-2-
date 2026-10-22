@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Projeto Integrador - É possível aquecer a piscina da escola com energia solar? Uma análise científica entre sistemas térmicos e fotovoltaicos.">
+    <meta name="keywords" content="energia solar, piscina, física, térmico, fotovoltaico, projeto integrador">
+    <meta name="author" content="Matheus V, Luisa A, Joao P, Yasmin M, Uriel H">
+    <meta name="theme-color" content="#6B21A8">
+    
+    <title>Piscina Solar | Projeto Integrador CEP</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%23F59E0B'/%3E%3C/svg%3E">
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=OpenDyslexic&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- VLibras - Acessibilidade em Libras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    
+    <!-- MathJax para fórmulas -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <!-- Skip Link para Acessibilidade -->
+    <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+    
+    <!-- Widget VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+    
+    <!-- Painel de Acessibilidade -->
+    <aside class="accessibility-panel" aria-label="Configurações de Acessibilidade">
+        <button class="a11y-toggle" id="a11yToggle" aria-expanded="false" aria-controls="a11yMenu" aria-label="Abrir configurações de acessibilidade">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="4"></circle>
+                <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+            </svg>
+            <span class="sr-only">Acessibilidade</span>
+        </button>
+        
+        <div class="a11y-menu" id="a11yMenu" role="menu" aria-hidden="true">
+            <h3>Configurações de Acessibilidade</h3>
+            
+            <button class="a11y-option" data-theme="high-contrast" role="menuitem">
+                <span class="icon">◐</span>
+                <span>Alto Contraste</span>
+            </button>
+            
+            <button class="a11y-option" data-theme="dyslexia" role="menuitem">
+                <span class="icon">Aa</span>
+                <span>Fonte para Dislexia</span>
+            </button>
+            
+            <button class="a11y-option" data-theme="large-text" role="menuitem">
+                <span class="icon">A+</span>
+                <span>Texto Grande</span>
+            </button>
+            
+            <button class="a11y-option" data-theme="reduce-motion" role="menuitem">
+                <span class="icon">⏸</span>
+                <span>Reduzir Animações</span>
+            </button>
+            
+            <button class="a11y-option" data-theme="reset" role="menuitem">
+                <span class="icon">↺</span>
+                <span>Restaurar Padrão</span>
+            </button>
+        </div>
+    </aside>
+    
+    <!-- Cabeçalho -->
+    <header class="site-header" role="banner">
+        <div class="header-container">
+            <a href="#home" class="logo" aria-label="Piscina Solar - Página Inicial">
+                <span class="logo-icon" aria-hidden="true">☀</span>
+                <span class="logo-text">Piscina<span>Solar</span></span>
+            </a>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menu de navegação">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <nav class="main-nav" id="mainNav" role="navigation" aria-label="Navegação principal">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link active">Início</a></li>
+                    <li><a href="#comparativo" class="nav-link">Térmico vs Fotovoltaico</a></li>
+                    <li><a href="#dados" class="nav-link">Dados Necessários</a></li>
+                    <li><a href="#simuladores" class="nav-link">Simuladores</a></li>
+                    <li><a href="#maquete" class="nav-link">Maquete</a></li>
+                    <li><a href="#integrantes" class="nav-link">Equipe</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Conteúdo Principal -->
+    <main id="main-content" role="main">
+        
+        <!-- Seção Hero -->
+        <section id="home" class="hero" aria-labelledby="hero-title">
+            <div class="hero-background" aria-hidden="true">
+                <div class="sun-animation"></div>
+                <div class="water-waves"></div>
+            </div>
+            
+            <div class="hero-content">
+                <span class="hero-badge">Projeto Integrador CEP • 3º Trimestre</span>
+                <h1 id="hero-title" class="hero-title">
+                    É possível aquecer a <span class="highlight">piscina da escola</span> com energia solar?
+                </h1>
+                <p class="hero-subtitle">
+                    Uma análise científica e tecnológica entre sistemas de aquecimento 
+                    <strong>solares térmicos</strong> e <strong>fotovoltaicos</strong>, 
+                    conectando Física, Robótica e Sustentabilidade.
+                </p>
+                
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="85">0</span>
+                        <span class="stat-unit">%</span>
+                        <span class="stat-label">Eficiência Térmica</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="22">0</span>
+                        <span class="stat-unit">%</span>
+                        <span class="stat-label">Eficiência Fotovoltaica</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="100">0</span>
+                        <span class="stat-unit">%</span>
+                        <span class="stat-label">Energia Limpa</span>
+                    </div>
+                </div>
+                
+                <div class="hero-cta">
+                    <a href="#comparativo" class="btn btn-primary">
+                        Explorar a Ciência
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                    <a href="#simuladores" class="btn btn-secondary">
+                        Ver Simuladores
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Introdução -->
+        <section class="intro-section" aria-labelledby="intro-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">O Desafio</span>
+                    <h2 id="intro-title" class="section-title">A Ciência por trás da Piscina Aquecida</h2>
+                    <p class="section-description">
+                        Aquecer uma piscina não é apenas uma questão de conforto — é um problema 
+                        complexo de <strong>termodinâmica</strong>, <strong>transferência de calor</strong> 
+                        e <strong>eficiência energética</strong>.
+                    </p>
+                </div>
+                
+                <div class="intro-grid">
+                    <article class="intro-card">
+                        <div class="intro-icon" aria-hidden="true">🌡️</div>
+                        <h3>Termodinâmica</h3>
+                        <p>
+                            A água da piscina troca calor com o ambiente por condução, convecção e radiação. 
+                            Entender essas trocas é essencial para dimensionar o sistema de aquecimento.
+                        </p>
+                    </article>
+                    
+                    <article class="intro-card">
+                        <div class="intro-icon" aria-hidden="true">☀️</div>
+                        <h3>Radiação Solar</h3>
+                        <p>
+                            O Sol emite radiação eletromagnética que se comporta como um corpo negro a ~5800K. 
+                            A Terra recebe cerca de 1361 W/m² na constante solar.
+                        </p>
+                    </article>
+                    
+                    <article class="intro-card">
+                        <div class="intro-icon" aria-hidden="true">⚡</div>
+                        <h3>Conversão de Energia</h3>
+                        <p>
+                            Podemos converter a radiação solar em calor (sistema térmico) ou em eletricidade 
+                            (sistema fotovoltaico). Cada abordagem tem suas vantagens.
+                        </p>
+                    </article>
+                    
+                    <article class="intro-card">
+                        <div class="intro-icon" aria-hidden="true">🤖</div>
+                        <h3>Automação</h3>
+                        <p>
+                            Sensores de temperatura, luminosidade e nível permitem otimizar o funcionamento 
+                            do sistema, economizando energia e água.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção Comparativa -->
+        <section id="comparativo" class="comparative-section" aria-labelledby="comp-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Análise Comparativa</span>
+                    <h2 id="comp-title" class="section-title">Térmico vs Fotovoltaico</h2>
+                    <p class="section-description">
+                        Duas tecnologias, dois princípios físicos distintos, um mesmo objetivo: 
+                        aproveitar a energia do Sol para aquecer a piscina.
+                    </p>
+                </div>
+                
+                <div class="comparison-container">
+                    <!-- Sistema Térmico -->
+                    <article class="comparison-card thermal">
+                        <div class="card-header">
+                            <div class="card-icon" aria-hidden="true">🔥</div>
+                            <h3>Aquecimento Solar Térmico</h3>
+                            <span class="card-badge">Conversão Direta</span>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h4>Princípio Físico</h4>
+                            <p>
+                                Baseia-se na <strong>absorção de radiação eletromagnética</strong> por uma 
+                                superfície escura (comportamento de corpo negro). A energia dos fótons é 
+                                convertida diretamente em energia térmica (calor), que é transferida para 
+                                a água por condução.
+                            </p>
+                            
+                            <h4>Como Funciona</h4>
+                            <ol class="process-list">
+                                <li>
+                                    <strong>Coletor solar</strong> absorve radiação visível e infravermelha
+                                </li>
+                                <li>
+                                    O fluido interno (geralmente água com anticongelante) é aquecido
+                                </li>
+                                <li>
+                                    Troca de calor com a água da piscina via serpentina
+                                </li>
+                                <li>
+                                    A água retorna ao coletor em ciclo contínuo
+                                </li>
+                            </ol>
+                            
+                            <h4>Fórmula Chave</h4>
+                            <div class="formula-box">
+                                <p>Lei de Stefan-Boltzmann:</p>
+                                <p class="formula">\( P = \varepsilon \cdot \sigma \cdot A \cdot T^4 \)</p>
+                                <p class="formula-desc">
+                                    Onde ε é a emissividade, σ a constante de Stefan-Boltzmann, 
+                                    A a área e T a temperatura em Kelvin.
+                                </p>
+                            </div>
+                            
+                            <h4>Vantagens</h4>
+                            <ul class="pros-list">
+                                <li>Alta eficiência (70-85%)</li>
+                                <li>Custo inicial menor</li>
+                                <li>Tecnologia madura e confiável</li>
+                                <li>Menor área de instalação</li>
+                                <li>Retorno rápido do investimento</li>
+                            </ul>
+                            
+                            <h4>Limitações</h4>
+                            <ul class="cons-list">
+                                <li>Apenas aquece água (uso específico)</li>
+                                <li>Dependência direta de sol</li>
+                                <li>Manutenção periódica necessária</li>
+                                <li>Risco de superaquecimento</li>
+                            </ul>
+                        </div>
+                    </article>
+                    
+                    <!-- Sistema Fotovoltaico -->
+                    <article class="comparison-card photovoltaic">
+                        <div class="card-header">
+                            <div class="card-icon" aria-hidden="true">⚡</div>
+                            <h3>Aquecimento Solar Fotovoltaico</h3>
+                            <span class="card-badge">Conversão Indireta</span>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h4>Princípio Físico</h4>
+                            <p>
+                                Baseia-se no <strong>efeito fotoelétrico</strong> (explicado por Einstein em 1905). 
+                                Fótons com energia suficiente (E = hf) ejetam elétrons de um material 
+                                semicondutor (geralmente silício), gerando corrente elétrica contínua.
+                            </p>
+                            
+                            <h4>Como Funciona</h4>
+                            <ol class="process-list">
+                                <li>
+                                    <strong>Fótons</strong> atingem as células fotovoltaicas
+                                </li>
+                                <li>
+                                    Elétrons são ejetados, gerando corrente contínua (CC)
+                                </li>
+                                <li>
+                                    Inversor converte CC em corrente alternada (CA)
+                                </li>
+                                <li>
+                                    Eletricidade alimenta bomba de calor (heat pump) ou resistência
+                                </li>
+                            </ol>
+                            
+                            <h4>Fórmula Chave</h4>
+                            <div class="formula-box">
+                                <p>Efeito Fotoelétrico:</p>
+                                <p class="formula">\( E_k = hf - \phi \)</p>
+                                <p class="formula-desc">
+                                    Onde Ek é a energia cinética do elétron, h a constante de Planck, 
+                                    f a frequência da luz e φ a função trabalho do material.
+                                </p>
+                            </div>
+                            
+                            <h4>Vantagens</h4>
+                            <ul class="pros-list">
+                                <li>Uso múltiplo (iluminação, bombas, etc)</li>
+                                <li>Menor manutenção</li>
+                                <li>Vida útil longa (25+ anos)</li>
+                                <li>Escalável modularmente</li>
+                                <li>Funciona mesmo em dias nublados</li>
+                            </ul>
+                            
+                            <h4>Limitações</h4>
+                            <ul class="cons-list">
+                                <li>Eficiência menor (15-22%)</li>
+                                <li>Custo inicial elevado</li>
+                                <li>Maior área necessária</li>
+                                <li>Perdas na conversão CC→CA</li>
+                                <li>Depende de bateria para uso noturno</li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+                
+                <!-- Tabela Comparativa -->
+                <div class="comparison-table-wrapper">
+                    <h3 class="table-title">Comparativo Direto</h3>
+                    <div class="table-responsive">
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Critério</th>
+                                    <th scope="col">Térmico</th>
+                                    <th scope="col">Fotovoltaico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Eficiência</strong></td>
+                                    <td>70-85%</td>
+                                    <td>15-22%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Custo Inicial</strong></td>
+                                    <td>Médio</td>
+                                    <td>Alto</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Área Necessária</strong></td>
+                                    <td>Menor</td>
+                                    <td>Maior</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Versatilidade</strong></td>
+                                    <td>Apenas aquecimento</td>
+                                    <td>Múltiplos usos</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vida Útil</strong></td>
+                                    <td>15-20 anos</td>
+                                    <td>25-30 anos</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Manutenção</strong></td>
+                                    <td>Moderada</td>
+                                    <td>Baixa</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Retorno</strong></td>
+                                    <td>3-5 anos</td>
+                                    <td>6-10 anos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Recomendação -->
+                <div class="recommendation-box">
+                    <h3>💡 Recomendação para a Escola</h3>
+                    <p>
+                        Para o caso específico de uma <strong>piscina escolar</strong>, o sistema 
+                        <strong>térmico é mais indicado</strong> devido à sua maior eficiência e custo-benefício. 
+                        No entanto, uma solução híbrida (térmico + fotovoltaico para alimentar bombas e iluminação) 
+                        seria a mais sustentável e educativa.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Dados Necessários -->
+        <section id="dados" class="data-section" aria-labelledby="data-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Dimensionamento</span>
+                    <h2 id="data-title" class="section-title">Dados Necessários para o Projeto</h2>
+                    <p class="section-description">
+                        Para estimar a energia necessária para aquecer a piscina, precisamos coletar 
+                        e analisar diversos dados técnicos e ambientais.
+                    </p>
+                </div>
+                
+                <div class="data-grid">
+                    <article class="data-card">
+                        <div class="data-icon" aria-hidden="true">📐</div>
+                        <h3>Dados da Piscina</h3>
+                        <ul>
+                            <li>Dimensões (comprimento × largura × profundidade)</li>
+                            <li>Volume total de água (em litros ou m³)</li>
+                            <li>Material de construção (concreto, vinil, fibra)</li>
+                            <li>Cor da piscina (afeta absorção térmica)</li>
+                            <li>Presença de cobertura ou capa térmica</li>
+                        </ul>
+                    </article>
+                    
+                    <article class="data-card">
+                        <div class="data-icon" aria-hidden="true">🌡️</div>
+                        <h3>Dados Climáticos</h3>
+                        <ul>
+                            <li>Temperatura média da água desejada (26-28°C)</li>
+                            <li>Temperatura ambiente média por mês</li>
+                            <li>Temperatura mínima histórica</li>
+                            <li>Índice de insolação anual (kWh/m²/dia)</li>
+                            <li>Velocidade média dos ventos</li>
+                            <li>Umidade relativa do ar</li>
+                        </ul>
+                    </article>
+                    
+                    <article class="data-card">
+                        <div class="data-icon" aria-hidden="true">☀️</div>
+                        <h3>Dados de Radiação</h3>
+                        <ul>
+                            <li>Irradiância solar local (W/m²)</li>
+                            <li>Horas de sol pleno por dia</li>
+                            <li>Ângulo de inclinação ideal dos coletores</li>
+                            <li>Orientação do telhado (N, S, L, O)</li>
+                            <li>Sombreamento existente (árvores, prédios)</li>
+                        </ul>
+                    </article>
+                    
+                    <article class="data-card">
+                        <div class="data-icon" aria-hidden="true">💰</div>
+                        <h3>Dados Econômicos</h3>
+                        <ul>
+                            <li>Custo da energia elétrica (R$/kWh)</li>
+                            <li>Orçamento disponível para investimento</li>
+                            <li>Período de uso da piscina (meses/ano)</li>
+                            <li>Horário de funcionamento</li>
+                            <li>Custo de manutenção esperado</li>
+                        </ul>
+                    </article>
+                </div>
+                
+                <!-- Calculadora Interativa -->
+                <div class="calculator-wrapper">
+                    <h3 class="calculator-title">🧮 Calculadora de Energia Necessária</h3>
+                    <p class="calculator-desc">
+                        Insira os dados abaixo para estimar a energia necessária para aquecer sua piscina.
+                    </p>
+                    
+                    <form class="calculator-form" id="energyCalculator" novalidate>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="poolLength">Comprimento da piscina (m)</label>
+                                <input type="number" id="poolLength" name="poolLength" min="1" max="100" step="0.1" value="10" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="poolWidth">Largura da piscina (m)</label>
+                                <input type="number" id="poolWidth" name="poolWidth" min="1" max="50" step="0.1" value="5" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="poolDepth">Profundidade média (m)</label>
+                                <input type="number" id="poolDepth" name="poolDepth" min="0.5" max="5" step="0.1" value="1.5" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="targetTemp">Temperatura desejada (°C)</label>
+                                <input type="number" id="targetTemp" name="targetTemp" min="20" max="40" step="0.5" value="28" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="initialTemp">Temperatura inicial da água (°C)</label>
+                                <input type="number" id="initialTemp" name="initialTemp" min="5" max="35" step="0.5" value="20" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="heatingTime">Tempo desejado para aquecer (horas)</label>
+                                <input type="number" id="heatingTime" name="heatingTime" min="1" max="48" step="1" value="8" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-large">
+                            Calcular Energia Necessária
+                        </button>
+                    </form>
+                    
+                    <div class="calculator-results" id="calculatorResults" aria-live="polite" hidden>
+                        <h4>Resultados do Cálculo</h4>
+                        
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Volume da piscina</span>
+                                <span class="result-value" id="resultVolume">--</span>
+                                <span class="result-unit">litros</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Energia necessária</span>
+                                <span class="result-value" id="resultEnergy">--</span>
+                                <span class="result-unit">kWh</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Potência requerida</span>
+                                <span class="result-value" id="resultPower">--</span>
+                                <span class="result-unit">kW</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Área de coletores térmicos</span>
+                                <span class="result-value" id="resultThermalArea">--</span>
+                                <span class="result-unit">m²</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Área de painéis fotovoltaicos</span>
+                                <span class="result-value" id="resultPVArea">--</span>
+                                <span class="result-unit">m²</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Custo estimado (térmico)</span>
+                                <span class="result-value" id="resultThermalCost">--</span>
+                                <span class="result-unit">R$</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Custo estimado (fotovoltaico)</span>
+                                <span class="result-value" id="resultPVCost">--</span>
+                                <span class="result-unit">R$</span>
+                            </div>
+                            
+                            <div class="result-item">
+                                <span class="result-label">Economia anual estimada</span>
+                                <span class="result-value" id="resultSavings">--</span>
+                                <span class="result-unit">R$/ano</span>
+                            </div>
+                        </div>
+                        
+                        <div class="results-explanation">
+                            <h5>Como o cálculo foi feito:</h5>
+                            <p>
+                                A energia necessária para aquecer a água é calculada pela fórmula:
+                            </p>
+                            <p class="formula">\( Q = m \cdot c \cdot \Delta T \)</p>
+                            <p>
+                                Onde: <strong>m</strong> é a massa da água (kg), <strong>c</strong> é o calor 
+                                específico da água (4,186 kJ/kg·°C), e <strong>ΔT</strong> é a variação de temperatura.
+                            </p>
+                            <p>
+                                Consideramos perdas térmicas de aproximadamente 20% para o ambiente, 
+                                e eficiência de 80% para coletores térmicos e 18% para painéis fotovoltaicos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Simuladores -->
+        <section id="simuladores" class="simulators-section" aria-labelledby="sim-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Laboratório Virtual</span>
+                    <h2 id="sim-title" class="section-title">Simuladores Interativos</h2>
+                    <p class="section-description">
+                        Explore os conceitos físicos através de simulações interativas. 
+                        Ajuste os parâmetros e veja os resultados em tempo real.
+                    </p>
+                </div>
+                
+                <div class="simulators-grid">
+                    <!-- Simulador 1: Corpo Negro -->
+                    <article class="simulator-card">
+                        <h3>🌡️ Simulador de Corpo Negro</h3>
+                        <p class="simulator-desc">
+                            Observe como a cor e a intensidade da radiação emitida mudam com a temperatura, 
+                            seguindo a Lei de Wien e a Lei de Stefan-Boltzmann.
+                        </p>
+                        
+                        <div class="simulator-canvas-wrapper">
+                            <canvas id="blackBodyCanvas" width="500" height="300" aria-label="Simulação de radiação de corpo negro"></canvas>
+                        </div>
+                        
+                        <div class="simulator-controls">
+                            <label for="blackBodyTemp">
+                                Temperatura: <span id="blackBodyTempValue">5800</span> K
+                            </label>
+                            <input type="range" id="blackBodyTemp" min="1000" max="10000" value="5800" step="100">
+                            
+                            <div class="simulator-info">
+                                <p><strong>Pico de emissão:</strong> <span id="blackBodyPeak">--</span> nm</p>
+                                <p><strong>Cor predominante:</strong> <span id="blackBodyColor">--</span></p>
+                                <p><strong>Potência emitida:</strong> <span id="blackBodyPower">--</span> W/m²</p>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <!-- Simulador 2: Efeito Fotoelétrico -->
+                    <article class="simulator-card">
+                        <h3>⚡ Simulador do Efeito Fotoelétrico</h3>
+                        <p class="simulator-desc">
+                            Teste diferentes frequências de luz e observe se elétrons são ejetados da superfície metálica.
+                        </p>
+                        
+                        <div class="simulator-canvas-wrapper">
+                            <canvas id="photoelectricCanvas" width="500" height="300" aria-label="Simulação do efeito fotoelétrico"></canvas>
+                        </div>
+                        
+                        <div class="simulator-controls">
+                            <label for="lightFrequency">
+                                Frequência da luz: <span id="lightFrequencyValue">6.0</span> × 10¹⁴ Hz
+                            </label>
+                            <input type="range" id="lightFrequency" min="3" max="10" value="6" step="0.1">
+                            
+                            <label for="lightIntensity">
+                                Intensidade da luz: <span id="lightIntensityValue">50</span>%
+                            </label>
+                            <input type="range" id="lightIntensity" min="0" max="100" value="50" step="5">
+                            
+                            <div class="simulator-info">
+                                <p><strong>Energia do fóton:</strong> <span id="photonEnergy">--</span> eV</p>
+                                <p><strong>Função trabalho:</strong> 2.3 eV (Sódio)</p>
+                                <p><strong>Elétrons ejetados:</strong> <span id="electronsEjected">--</span></p>
+                                <p><strong>Status:</strong> <span id="photoelectricStatus">--</span></p>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <!-- Simulador 3: Perda Térmica -->
+                    <article class="simulator-card">
+                        <h3>💧 Simulador de Perda Térmica</h3>
+                        <p class="simulator-desc">
+                            Veja como a temperatura da piscina muda ao longo da noite e o efeito da capa térmica.
+                        </p>
+                        
+                        <div class="simulator-canvas-wrapper">
+                            <canvas id="heatLossCanvas" width="500" height="300" aria-label="Simulação de perda térmica da piscina"></canvas>
+                        </div>
+                        
+                        <div class="simulator-controls">
+                            <label for="initialWaterTemp">
+                                Temperatura inicial: <span id="initialWaterTempValue">28</span>°C
+                            </label>
+                            <input type="range" id="initialWaterTemp" min="20" max="35" value="28" step="0.5">
+                            
+                            <label for="ambientTemp">
+                                Temperatura ambiente: <span id="ambientTempValue">15</span>°C
+                            </label>
+                            <input type="range" id="ambientTemp" min="5" max="25" value="15" step="0.5">
+                            
+                            <label for="thermalCover">
+                                <input type="checkbox" id="thermalCover"> Usar capa térmica
+                            </label>
+                            
+                            <div class="simulator-info">
+                                <p><strong>Temp. após 8h (sem capa):</strong> <span id="tempWithoutCover">--</span>°C</p>
+                                <p><strong>Temp. após 8h (com capa):</strong> <span id="tempWithCover">--</span>°C</p>
+                                <p><strong>Economia de energia:</strong> <span id="energySaved">--</span>%</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção da Maquete -->
+        <section id="maquete" class="maquette-section" aria-labelledby="maq-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Protótipo</span>
+                    <h2 id="maq-title" class="section-title">A Maquete como Solução</h2>
+                    <p class="section-description">
+                        A maquete representa uma solução escalável e didática para a escola, 
+                        demonstrando na prática os conceitos estudados.
+                    </p>
+                </div>
+                
+                <div class="maquette-content">
+                    <div class="maquette-visual">
+                        <div class="maquette-diagram" role="img" aria-label="Diagrama da maquete do sistema de aquecimento solar">
+                            <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Sol -->
+                                <circle cx="100" cy="80" r="40" fill="#F59E0B" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Raios solares -->
+                                <g stroke="#F59E0B" stroke-width="2" opacity="0.6">
+                                    <line x1="140" y1="80" x2="200" y2="150"/>
+                                    <line x1="130" y1="110" x2="190" y2="180"/>
+                                    <line x1="120" y1="120" x2="180" y2="190"/>
+                                </g>
+                                
+                                <!-- Telhado -->
+                                <polygon points="180,150 400,150 420,180 160,180" fill="#6B21A8"/>
+                                
+                                <!-- Coletor solar -->
+                                <rect x="200" y="130" width="180" height="20" fill="#1E1B4B" stroke="#9333EA" stroke-width="2"/>
+                                <text x="290" y="145" text-anchor="middle" fill="#C084FC" font-size="10">Coletor Térmico</text>
+                                
+                                <!-- Tubulações -->
+                                <path d="M 290 150 L 290 220 L 450 220 L 450 280" stroke="#9333EA" stroke-width="3" fill="none"/>
+                                <path d="M 450 280 L 450 220 L 290 220 L 290 150" stroke="#C084FC" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
+                                
+                                <!-- Piscina -->
+                                <rect x="350" y="280" width="200" height="80" fill="#3B82F6" opacity="0.7" rx="5"/>
+                                <text x="450" y="325" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Piscina</text>
+                                
+                                <!-- Ondas na água -->
+                                <path d="M 360 300 Q 370 295 380 300 T 400 300 T 420 300 T 440 300 T 460 300 T 480 300 T 500 300 T 520 300 T 540 300" stroke="white" stroke-width="2" fill="none" opacity="0.5">
+                                    <animate attributeName="d" values="M 360 300 Q 370 295 380 300 T 400 300 T 420 300 T 440 300 T 460 300 T 480 300 T 500 300 T 520 300 T 540 300;M 360 300 Q 370 305 380 300 T 400 300 T 420 300 T 440 300 T 460 300 T 480 300 T 500 300 T 520 300 T 540 300;M 360 300 Q 370 295 380 300 T 400 300 T 420 300 T 440 300 T 460 300 T 480 300 T 500 300 T 520 300 T 540 300" dur="2s" repeatCount="indefinite"/>
+                                </path>
+                                
+                                <!-- Sensores -->
+                                <circle cx="380" cy="290" r="5" fill="#10B981"/>
+                                <text x="380" y="280" text-anchor="middle" fill="#10B981" font-size="9">Sensor Temp</text>
+                                
+                                <circle cx="520" cy="290" r="5" fill="#F59E0B"/>
+                                <text x="520" y="280" text-anchor="middle" fill="#F59E0B" font-size="9">Sensor Nível</text>
+                                
+                                <!-- Painel fotovoltaico (opcional) -->
+                                <rect x="50" y="200" width="80" height="50" fill="#1E1B4B" stroke="#9333EA" stroke-width="2"/>
+                                <line x1="70" y1="200" x2="70" y2="250" stroke="#9333EA" stroke-width="1"/>
+                                <line x1="90" y1="200" x2="90" y2="250" stroke="#9333EA" stroke-width="1"/>
+                                <line x1="110" y1="200" x2="110" y2="250" stroke="#9333EA" stroke-width="1"/>
+                                <line x1="50" y1="225" x2="130" y2="225" stroke="#9333EA" stroke-width="1"/>
+                                <text x="90" y="270" text-anchor="middle" fill="#C084FC" font-size="10">Painel FV</text>
+                                
+                                <!-- Legenda -->
+                                <rect x="20" y="330" width="15" height="3" fill="#9333EA"/>
+                                <text x="40" y="335" fill="#F5F3FF" font-size="10">Água quente</text>
+                                
+                                <rect x="20" y="350" width="15" height="3" fill="#C084FC"/>
+                                <text x="40" y="355" fill="#F5F3FF" font-size="10">Água fria (retorno)</text>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="maquette-info">
+                        <h3>O que a maquete representa</h3>
+                        
+                        <div class="maquette-features">
+                            <div class="feature-item">
+                                <span class="feature-icon" aria-hidden="true">🔥</span>
+                                <div>
+                                    <h4>Sistema de Aquecimento</h4>
+                                    <p>Coletor solar térmico em miniatura com circulação de água por termossifão.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <span class="feature-icon" aria-hidden="true">🌡️</span>
+                                <div>
+                                    <h4>Sensores de Temperatura</h4>
+                                    <p>DS18B20 monitorando a temperatura da água em tempo real, com display LCD.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <span class="feature-icon" aria-hidden="true">💡</span>
+                                <div>
+                                    <h4>Iluminação Automática</h4>
+                                    <p>LDR detecta a luminosidade ambiente e aciona LEDs para simular iluminação noturna.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <span class="feature-icon" aria-hidden="true">💧</span>
+                                <div>
+                                    <h4>Controle de Nível</h4>
+                                    <p>Sensor ultrassônico HC-SR04 monitora o nível da água e aciona bomba de reposição.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <span class="feature-icon" aria-hidden="true">⚙️</span>
+                                <div>
+                                    <h4>Automação com Arduino</h4>
+                                    <p>Microcontrolador Arduino Uno coordena todos os sensores e atuadores do sistema.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="maquette-benefits">
+                            <h4>Benefícios Educacionais</h4>
+                            <ul>
+                                <li>Demonstra conceitos abstratos de forma concreta</li>
+                                <li>Permite experimentação segura e controlada</li>
+                                <li>Integra múltiplas disciplinas (Física, Química, Matemática)</li>
+                                <li>Estimula o pensamento crítico e resolução de problemas</li>
+                                <li>Pode ser replicada por outros alunos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Impacto -->
+        <section class="impact-section" aria-labelledby="impact-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Sustentabilidade</span>
+                    <h2 id="impact-title" class="section-title">Impacto Ambiental e Social</h2>
+                </div>
+                
+                <div class="impact-grid">
+                    <article class="impact-card">
+                        <div class="impact-number">🌱</div>
+                        <h3>Redução de CO₂</h3>
+                        <p class="impact-value">~2 toneladas/ano</p>
+                        <p>
+                            Equivalente ao plantio de 15 árvores ou à remoção de 4 carros de circulação.
+                        </p>
+                    </article>
+                    
+                    <article class="impact-card">
+                        <div class="impact-number">💧</div>
+                        <h3>Economia de Água</h3>
+                        <p class="impact-value">~30% menos evaporação</p>
+                        <p>
+                            Com o uso de capa térmica, reduzimos significativamente a perda de água por evaporação.
+                        </p>
+                    </article>
+                    
+                    <article class="impact-card">
+                        <div class="impact-number">💰</div>
+                        <h3>Economia Financeira</h3>
+                        <p class="impact-value">~R$ 3.000/ano</p>
+                        <p>
+                            Redução na conta de energia elétrica da escola, liberando recursos para outras áreas.
+                        </p>
+                    </article>
+                    
+                    <article class="impact-card">
+                        <div class="impact-number">🎓</div>
+                        <h3>Educação Ambiental</h3>
+                        <p class="impact-value">500+ alunos/ano</p>
+                        <p>
+                            Projeto multidisciplinar que atinge toda a comunidade escolar com conceitos de sustentabilidade.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Integrantes -->
+        <section id="integrantes" class="team-section" aria-labelledby="team-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Equipe</span>
+                    <h2 id="team-title" class="section-title">Integrantes do Projeto</h2>
+                    <p class="section-description">
+                        Conheça a equipe multidisciplinar que desenvolveu este projeto integrador.
+                    </p>
+                </div>
+                
+                <div class="team-grid">
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <span class="avatar-initials">MV</span>
+                        </div>
+                        <h3 class="team-name">Matheus V</h3>
+                        <p class="team-role">Programação & Desenvolvimento Web</p>
+                        <p class="team-description">
+                            Responsável pela estrutura do site, simuladores interativos e implementação 
+                            de recursos de acessibilidade.
+                        </p>
+                        <div class="team-skills">
+                            <span class="skill-tag">HTML5</span>
+                            <span class="skill-tag">CSS3</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">Acessibilidade</span>
+                        </div>
+                    </article>
+                    
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <span class="avatar-initials">LA</span>
+                        </div>
+                        <h3 class="team-name">Luisa A</h3>
+                        <p class="team-role">Pesquisa Científica & Documentação</p>
+                        <p class="team-description">
+                            Responsável pela pesquisa teórica sobre termodinâmica, radiação solar 
+                            e elaboração dos textos científicos.
+                        </p>
+                        <div class="team-skills">
+                            <span class="skill-tag">Física</span>
+                            <span class="skill-tag">Termodinâmica</span>
+                            <span class="skill-tag">Pesquisa</span>
+                            <span class="skill-tag">Redação</span>
+                        </div>
+                    </article>
+                    
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <span class="avatar-initials">JP</span>
+                        </div>
+                        <h3 class="team-name">Joao P</h3>
+                        <p class="team-role">Robótica & Automação</p>
+                        <p class="team-description">
+                            Responsável pelo desenvolvimento da maquete, programação dos sensores 
+                            e integração com microcontroladores.
+                        </p>
+                        <div class="team-skills">
+                            <span class="skill-tag">Arduino</span>
+                            <span class="skill-tag">Sensores</span>
+                            <span class="skill-tag">Eletrônica</span>
+                            <span class="skill-tag">Prototipagem</span>
+                        </div>
+                    </article>
+                    
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <span class="avatar-initials">YM</span>
+                        </div>
+                        <h3 class="team-name">Yasmin M</h3>
+                        <p class="team-role">Design & Identidade Visual</p>
+                        <p class="team-description">
+                            Responsável pelo design do site, paleta de cores, tipografia 
+                            e criação de elementos visuais.
+                        </p>
+                        <div class="team-skills">
+                            <span class="skill-tag">UI/UX Design</span>
+                            <span class="skill-tag">Figma</span>
+                            <span class="skill-tag">CSS</span>
+                            <span class="skill-tag">Animações</span>
+                        </div>
+                    </article>
+                    
+                    <article class="team-card">
+                        <div class="team-avatar">
+                            <span class="avatar-initials">UH</span>
+                        </div>
+                        <h3 class="team-name">Uriel H</h3>
+                        <p class="team-role">Coordenação & Análise de Dados</p>
+                        <p class="team-description">
+                            Responsável pela coordenação do projeto, análise de dados técnicos 
+                            e cálculos de dimensionamento.
+                        </p>
+                        <div class="team-skills">
+                            <span class="skill-tag">Gestão</span>
+                            <span class="skill-tag">Matemática</span>
+                            <span class="skill-tag">Análise</span>
+                            <span class="skill-tag">Apresentação</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Referências -->
+        <section class="references-section" aria-labelledby="ref-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Fontes</span>
+                    <h2 id="ref-title" class="section-title">Referências Bibliográficas</h2>
+                </div>
+                
+                <div class="references-list">
+                    <article class="reference-item">
+                        <h3>HALLIDAY, D.; RESNICK, R.; WALKER, J.</h3>
+                        <p><em>Fundamentos de Física: Gravitação, Ondas e Termodinâmica</em>. Volume 2. 10ª ed. Rio de Janeiro: LTC, 2016.</p>
+                    </article>
+                    
+                    <article class="reference-item">
+                        <h3>TIPLER, P. A.; LLEWELLYN, R. A.</h3>
+                        <p><em>Física Moderna</em>. 3ª ed. Rio de Janeiro: LTC, 2016.</p>
+                    </article>
+                    
+                    <article class="reference-item">
+                        <h3>ANEEL - Agência Nacional de Energia Elétrica</h3>
+                        <p><em>Banco de Informações de Geração</em>. Disponível em: http://www.aneel.gov.br. Acesso em: out. 2026.</p>
+                    </article>
+                    
+                    <article class="reference-item">
+                        <h3>CRESESB - Centro de Referência em Energia Solar e Eólica</h3>
+                        <p><em>M manual de Engenharia para Sistemas Fotovoltaicos</em>. Rio de Janeiro: CRESESB, 2020.</p>
+                    </article>
+                    
+                    <article class="reference-item">
+                        <h3>PHET Interactive Simulations</h3>
+                        <p>University of Colorado Boulder. Disponível em: https://phet.colorado.edu. Acesso em: out. 2026.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Rodapé -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Piscina Solar</h3>
+                    <p>
+                        Projeto Integrador do 3º Trimestre - CEP<br>
+                        Uma análise científica e tecnológica sobre o aquecimento solar de piscinas.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Navegação</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#comparativo">Térmico vs Fotovoltaico</a></li>
+                        <li><a href="#dados">Dados Necessários</a></li>
+                        <li><a href="#simuladores">Simuladores</a></li>
+                        <li><a href="#maquete">Maquete</a></li>
+                        <li><a href="#integrantes">Equipe</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Acessibilidade</h3>
+                    <p>
+                        Este site foi desenvolvido seguindo as diretrizes WCAG 2.1 nível AA, 
+                        garantindo acessibilidade para todos os usuários.
+                    </p>
+                    <div class="footer-badges">
+                        <span class="badge">VLibras</span>
+                        <span class="badge">WCAG 2.1</span>
+                        <span class="badge">Mobile-First</span>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Tecnologias</h3>
+                    <div class="tech-stack">
+                        <span class="tech-item">HTML5</span>
+                        <span class="tech-item">CSS3</span>
+                        <span class="tech-item">JavaScript</span>
+                        <span class="tech-item">Canvas API</span>
+                        <span class="tech-item">MathJax</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>
+                    © 2026 - Projeto desenvolvido por 
+                    <strong>Matheus V, Luisa A, Joao P, Yasmin M e Uriel H</strong>
+                </p>
+                <p>
+                    Projeto Integrador CEP • 3º Trimestre 2026
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Botão Voltar ao Topo -->
+    <button class="back-to-top" id="backToTop" aria-label="Voltar ao topo da página">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+    
+    <!-- Script Principal -->
+    <script src="script.js"></script>
+</body>
+</html>
