@@ -25,6 +25,7 @@ const formatNumber = (num) => num.toLocaleString('pt-BR', { maximumFractionDigit
 class AccessibilityManager {
     constructor() {
         this.toggle = $('#a11yToggle');
+        if (!this.toggle) return;
         this.menu = $('#a11yMenu');
         this.options = $$('.a11y-option');
         this.currentTheme = localStorage.getItem('accessibility-theme') || 'default';
@@ -61,28 +62,35 @@ class AccessibilityManager {
 class ThemeManager {
     constructor() {
         this.toggle = $('#themeToggle');
-        this.currentTheme = localStorage.getItem('color-theme') || 'light';
+        if (!this.toggle) return; // Segurança: não quebra se o botão não existir no HTML
         this.init();
     }
     init() {
-        if (this.currentTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        const savedTheme = localStorage.getItem('color-theme');
+        if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        
         this.toggle.addEventListener('click', () => this.toggleTheme());
         this.toggle.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggleTheme(); } });
     }
     toggleTheme() {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('color-theme', 'light'); this.currentTheme = 'light'; this.announce('Modo claro ativado'); }
-        else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('color-theme', 'dark'); this.currentTheme = 'dark'; this.announce('Modo escuro ativado'); }
+        if (isDark) { 
+            document.documentElement.removeAttribute('data-theme'); 
+            localStorage.setItem('color-theme', 'light'); 
+        } else { 
+            document.documentElement.setAttribute('data-theme', 'dark'); 
+            localStorage.setItem('color-theme', 'dark'); 
+        }
     }
-    announce(msg) { const el = document.createElement('div'); el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); el.className = 'sr-only'; el.textContent = msg; document.body.appendChild(el); setTimeout(() => document.body.removeChild(el), 1000); }
 }
 
 // ============================================
-// 3. GERENCIADOR DE ZOOM
+// 3. GERENCIADOR DE ZOOM (SEM BUG DE LAYOUT)
 // ============================================
 class ZoomManager {
     constructor() {
         this.toggle = $('#zoomToggle');
+        if (!this.toggle) return; // Segurança
         this.menu = $('#zoomMenu');
         this.zoomOutBtn = $('#zoomOut');
         this.zoomResetBtn = $('#zoomReset');
@@ -90,25 +98,28 @@ class ZoomManager {
         this.zoomValueDisplay = $('#zoomValue');
         this.zoomLevel = parseFloat(localStorage.getItem('zoom-level')) || 1;
         this.zoomStep = 0.1;
-        this.minZoom = 0.7;
+        this.minZoom = 0.8;
         this.maxZoom = 1.5;
         this.init();
     }
     init() {
         if (this.zoomLevel !== 1) this.applyZoom(this.zoomLevel, false);
+        
         this.toggle.addEventListener('click', () => this.toggleMenu());
         this.toggle.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggleMenu(); } });
         this.zoomOutBtn.addEventListener('click', () => this.decreaseZoom());
         this.zoomResetBtn.addEventListener('click', () => this.resetZoom());
         this.zoomInBtn.addEventListener('click', () => this.increaseZoom());
+        
         document.addEventListener('click', (e) => { if (!this.toggle.contains(e.target) && !this.menu.contains(e.target)) this.closeMenu(); });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.menu.classList.contains('active')) { this.closeMenu(); this.toggle.focus(); } });
+        
+        // Atalhos de teclado
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); this.increaseZoom(); }
             else if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); this.decreaseZoom(); }
             else if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); this.resetZoom(); }
         });
-        window.addEventListener('resize', debounce(() => { if (this.zoomLevel !== 1) this.applyZoom(this.zoomLevel, false); }, 200));
     }
     toggleMenu() { this.menu.classList.contains('active') ? this.closeMenu() : this.openMenu(); }
     openMenu() { this.menu.classList.add('active'); this.toggle.setAttribute('aria-expanded', 'true'); this.menu.setAttribute('aria-hidden', 'false'); }
@@ -116,18 +127,23 @@ class ZoomManager {
     increaseZoom() { this.applyZoom(Math.min(this.zoomLevel + this.zoomStep, this.maxZoom)); }
     decreaseZoom() { this.applyZoom(Math.max(this.zoomLevel - this.zoomStep, this.minZoom)); }
     resetZoom() { this.applyZoom(1); }
+    
     applyZoom(level, save = true) {
         this.zoomLevel = level;
-        this.zoomValueDisplay.textContent = `${Math.round(level * 100)}%`;
-        document.body.style.transform = `scale(${level})`;
-        document.body.style.transformOrigin = 'top left';
-        const inverseWidth = 100 / level;
-        document.body.style.width = `${inverseWidth}%`;
-        const viewportHeight = window.innerHeight;
-        document.body.style.minHeight = `${viewportHeight / level}px`;
-        if (save) { localStorage.setItem('zoom-level', level); this.announce(`Zoom ajustado para ${Math.round(level * 100)}%`); }
+        if (this.zoomValueDisplay) this.zoomValueDisplay.textContent = `${Math.round(level * 100)}%`;
+        
+        // CORREÇÃO DO BUG DO ESPAÇO EM BRANCO:
+        // Em vez de usar transform: scale() no body (que quebra o layout e cria espaço branco),
+        // nós ajustamos o tamanho da fonte base do HTML. Como todo o site usa 'rem',
+        // tudo aumenta proporcionalmente sem quebrar o fluxo do documento!
+        if (level === 1) {
+            document.documentElement.style.fontSize = '';
+        } else {
+            document.documentElement.style.fontSize = `${16 * level}px`;
+        }
+        
+        if (save) localStorage.setItem('zoom-level', level);
     }
-    announce(msg) { const el = document.createElement('div'); el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); el.className = 'sr-only'; el.textContent = msg; document.body.appendChild(el); setTimeout(() => document.body.removeChild(el), 1000); }
 }
 
 // ============================================
@@ -144,7 +160,7 @@ class NavigationManager {
     }
     init() {
         window.addEventListener('scroll', debounce(() => this.handleScroll(), 100));
-        this.mobileToggle.addEventListener('click', () => this.toggleMobileMenu());
+        if (this.mobileToggle) this.mobileToggle.addEventListener('click', () => this.toggleMobileMenu());
         this.navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -156,16 +172,18 @@ class NavigationManager {
             });
         });
         window.addEventListener('scroll', debounce(() => this.updateActiveLink(), 100));
-        this.backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        if (this.backToTop) this.backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     }
     handleScroll() {
         const scrollY = window.scrollY;
         if (scrollY > 50) this.header.classList.add('scrolled'); else this.header.classList.remove('scrolled');
-        if (scrollY > 500) this.backToTop.classList.add('visible'); else this.backToTop.classList.remove('visible');
+        if (this.backToTop) {
+            if (scrollY > 500) this.backToTop.classList.add('visible'); else this.backToTop.classList.remove('visible');
+        }
     }
     toggleMobileMenu() { this.mainNav.classList.contains('active') ? this.closeMobileMenu() : this.openMobileMenu(); }
-    openMobileMenu() { this.mainNav.classList.add('active'); this.mobileToggle.classList.add('active'); this.mobileToggle.setAttribute('aria-expanded', 'true'); }
-    closeMobileMenu() { this.mainNav.classList.remove('active'); this.mobileToggle.classList.remove('active'); this.mobileToggle.setAttribute('aria-expanded', 'false'); }
+    openMobileMenu() { this.mainNav.classList.add('active'); if(this.mobileToggle) this.mobileToggle.classList.add('active'); if(this.mobileToggle) this.mobileToggle.setAttribute('aria-expanded', 'true'); }
+    closeMobileMenu() { this.mainNav.classList.remove('active'); if(this.mobileToggle) this.mobileToggle.classList.remove('active'); if(this.mobileToggle) this.mobileToggle.setAttribute('aria-expanded', 'false'); }
     updateActiveLink() {
         const scrollPos = window.scrollY + 200;
         this.navLinks.forEach(link => {
@@ -220,6 +238,7 @@ class RevealAnimation {
 class EnergyCalculator {
     constructor() {
         this.form = $('#energyForm');
+        if (!this.form) return;
         this.results = $('#calcResults');
         this.SPECIFIC_HEAT_WATER = 4.186;
         this.DENSITY_WATER = 1000;
@@ -282,6 +301,7 @@ class EnergyCalculator {
 class BlackBodySimulator {
     constructor() {
         this.canvas = $('#blackBodyCanvas');
+        if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         this.tempSlider = $('#bbTemp');
         this.tempValue = $('#bbTempValue');
@@ -359,6 +379,7 @@ class BlackBodySimulator {
 class PhotoelectricSimulator {
     constructor() {
         this.canvas = $('#photoelectricCanvas');
+        if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         this.freqSlider = $('#peFreq');
         this.freqValue = $('#peFreqValue');
@@ -442,6 +463,7 @@ class PhotoelectricSimulator {
 class HeatLossSimulator {
     constructor() {
         this.canvas = $('#heatLossCanvas');
+        if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         this.initialTempSlider = $('#hlInitial');
         this.initialTempValue = $('#hlInitialValue');
@@ -533,14 +555,4 @@ document.addEventListener('DOMContentLoaded', () => {
     new BlackBodySimulator();
     new PhotoelectricSimulator();
     new HeatLossSimulator();
-    console.log('%c🌞 Piscina Solar - Projeto Integrador CEP', 'color: #57449a; font-size: 20px; font-weight: bold;');
-    console.log('%cDesenvolvido por: Matheus V, Luisa A, Joao P, Yasmin M, Uriel H', 'color: #57449a; font-size: 14px;');
 });
-
-if (typeof window !== 'undefined') {
-    window.PiscinaSolar = {
-        AccessibilityManager, ThemeManager, ZoomManager, NavigationManager,
-        CounterAnimation, RevealAnimation, EnergyCalculator,
-        BlackBodySimulator, PhotoelectricSimulator, HeatLossSimulator
-    };
-}
