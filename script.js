@@ -335,4 +335,212 @@ class BlackBodySimulator {
         this.ctx.stroke();
         const peakX = ((peakWavelength - 200) / 1800) * width;
         const peakIntensity = this.planckDistribution(peakWavelength * 1e-9, temperature);
-        const normalizedPeak = peakIntensity /
+        const normalizedPeak = peakIntensity / maxIntensity;
+        const peakY = height - 60 - (normalizedPeak * (height - 100));
+        this.ctx.fillStyle = color; this.ctx.beginPath(); this.ctx.arc(peakX, peakY, 8, 0, Math.PI * 2); this.ctx.fill();
+        this.ctx.fillStyle = '#e8f1f9'; this.ctx.font = '14px Inter'; this.ctx.textAlign = 'center';
+        this.ctx.fillText(`λ_max = ${peakWavelength.toFixed(0)} nm`, peakX, peakY - 15);
+        this.ctx.fillStyle = '#e0d7ef'; this.ctx.font = '12px Inter'; this.ctx.textAlign = 'left';
+        this.ctx.fillText('Comprimento de onda (nm)', 10, height - 10);
+        this.ctx.save(); this.ctx.translate(15, height / 2); this.ctx.rotate(-Math.PI / 2);
+        this.ctx.fillText('Intensidade', 0, 0); this.ctx.restore();
+    }
+    planckDistribution(wavelength, temperature) {
+        const h = 6.626e-34, c = 3e8, k = 1.381e-23;
+        const numerator = 2 * h * Math.pow(c, 2);
+        const denominator = Math.pow(wavelength, 5) * (Math.exp((h * c) / (wavelength * k * temperature)) - 1);
+        return numerator / denominator;
+    }
+}
+
+// ============================================
+// 9. SIMULADOR EFEITO FOTOELÉTRICO
+// ============================================
+class PhotoelectricSimulator {
+    constructor() {
+        this.canvas = $('#photoelectricCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.freqSlider = $('#peFreq');
+        this.freqValue = $('#peFreqValue');
+        this.intensitySlider = $('#peIntensity');
+        this.intensityValue = $('#peIntensityValue');
+        this.photonEnergyDisplay = $('#peEnergy');
+        this.statusDisplay = $('#peStatus');
+        this.PLANCK_CONSTANT = 4.136e-15;
+        this.WORK_FUNCTION = 2.3;
+        this.photons = [];
+        this.electrons = [];
+        this.init();
+    }
+    init() {
+        this.freqSlider.addEventListener('input', () => this.update());
+        this.intensitySlider.addEventListener('input', () => this.update());
+        this.update();
+        this.animate();
+    }
+    update() {
+        const frequency = parseFloat(this.freqSlider.value);
+        const intensity = parseInt(this.intensitySlider.value);
+        this.freqValue.textContent = `${frequency.toFixed(1)} × 10¹⁴ Hz`;
+        this.intensityValue.textContent = `${intensity}%`;
+        const photonEnergy = this.PLANCK_CONSTANT * frequency * 1e14;
+        this.photonEnergyDisplay.textContent = `${photonEnergy.toFixed(2)} eV`;
+        const canEmit = photonEnergy > this.WORK_FUNCTION;
+        if (canEmit) { const kineticEnergy = photonEnergy - this.WORK_FUNCTION; this.statusDisplay.textContent = `Emitindo! Ec = ${kineticEnergy.toFixed(2)} eV`; this.statusDisplay.style.color = '#10B981'; }
+        else { this.statusDisplay.textContent = 'Sem emissão (energia insuficiente)'; this.statusDisplay.style.color = '#EF4444'; }
+        this.updateParticles(frequency, intensity, canEmit);
+    }
+    updateParticles(frequency, intensity, canEmit) {
+        const photonCount = Math.floor(intensity / 20);
+        for (let i = 0; i < photonCount; i++) { if (Math.random() < 0.1) this.photons.push({ x: 50, y: 100 + Math.random() * 100, speed: 3 + Math.random() * 2, frequency }); }
+        if (this.photons.length > 50) this.photons = this.photons.slice(-50);
+        if (this.electrons.length > 30) this.electrons = this.electrons.slice(-30);
+    }
+    animate() {
+        const width = this.canvas.width; const height = this.canvas.height;
+        this.ctx.fillStyle = '#1f252f'; this.ctx.fillRect(0, 0, width, height);
+        this.ctx.fillStyle = '#57449a'; this.ctx.fillRect(250, 80, 20, 140);
+        this.ctx.fillStyle = '#e0d7ef'; this.ctx.fillRect(400, 80, 20, 140);
+        const frequency = parseFloat(this.freqSlider.value);
+        const color = this.frequencyToColor(frequency);
+        this.ctx.fillStyle = color; this.ctx.beginPath(); this.ctx.arc(50, 150, 30, 0, Math.PI * 2); this.ctx.fill();
+        this.photons.forEach((photon, index) => {
+            photon.x += photon.speed;
+            this.ctx.fillStyle = color; this.ctx.beginPath(); this.ctx.arc(photon.x, photon.y, 4, 0, Math.PI * 2); this.ctx.fill();
+            if (photon.x >= 250) {
+                this.photons.splice(index, 1);
+                const photonEnergy = this.PLANCK_CONSTANT * photon.frequency * 1e14;
+                if (photonEnergy > this.WORK_FUNCTION) this.electrons.push({ x: 270, y: photon.y, speed: 2 + Math.random() * 2, life: 100 });
+            }
+        });
+        this.electrons.forEach((electron, index) => {
+            electron.x += electron.speed; electron.life--;
+            this.ctx.fillStyle = '#10B981'; this.ctx.beginPath(); this.ctx.arc(electron.x, electron.y, 5, 0, Math.PI * 2); this.ctx.fill();
+            if (electron.x > width || electron.life <= 0) this.electrons.splice(index, 1);
+        });
+        this.ctx.fillStyle = '#e8f1f9'; this.ctx.font = '12px Inter'; this.ctx.textAlign = 'center';
+        this.ctx.fillText('Fonte de Luz', 50, 200);
+        this.ctx.fillText('Placa Metálica', 260, 240);
+        this.ctx.fillText('Coletor', 410, 240);
+        requestAnimationFrame(() => this.animate());
+    }
+    frequencyToColor(frequency) {
+        const wavelength = 300 / frequency;
+        if (wavelength < 380) return '#8B00FF';
+        if (wavelength < 450) return '#0000FF';
+        if (wavelength < 495) return '#00FFFF';
+        if (wavelength < 570) return '#00FF00';
+        if (wavelength < 590) return '#FFFF00';
+        if (wavelength < 620) return '#FFA500';
+        return '#FF0000';
+    }
+}
+
+// ============================================
+// 10. SIMULADOR PERDA TÉRMICA
+// ============================================
+class HeatLossSimulator {
+    constructor() {
+        this.canvas = $('#heatLossCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.initialTempSlider = $('#hlInitial');
+        this.initialTempValue = $('#hlInitialValue');
+        this.ambientTempSlider = $('#hlAmbient');
+        this.ambientTempValue = $('#hlAmbientValue');
+        this.thermalCoverCheckbox = $('#hlCover');
+        this.tempWithoutCoverDisplay = $('#hlWithout');
+        this.tempWithCoverDisplay = $('#hlWith');
+        this.energySavedDisplay = $('#hlSaved');
+        this.init();
+    }
+    init() {
+        this.initialTempSlider.addEventListener('input', () => this.update());
+        this.ambientTempSlider.addEventListener('input', () => this.update());
+        this.thermalCoverCheckbox.addEventListener('change', () => this.update());
+        this.update();
+    }
+    update() {
+        const initialTemp = parseFloat(this.initialTempSlider.value);
+        const ambientTemp = parseFloat(this.ambientTempSlider.value);
+        this.initialTempValue.textContent = `${initialTemp}°C`;
+        this.ambientTempValue.textContent = `${ambientTemp}°C`;
+        const hours = 8, timeStep = 0.5;
+        const tempsWithoutCover = [initialTemp];
+        const tempsWithCover = [initialTemp];
+        const heatLossCoeffWithout = 0.08;
+        const heatLossCoeffWith = 0.02;
+        let currentTemp = initialTemp;
+        for (let t = 0; t < hours; t += timeStep) { const deltaT = currentTemp - ambientTemp; currentTemp -= deltaT * heatLossCoeffWithout * timeStep; tempsWithoutCover.push(Math.max(currentTemp, ambientTemp)); }
+        currentTemp = initialTemp;
+        for (let t = 0; t < hours; t += timeStep) { const deltaT = currentTemp - ambientTemp; currentTemp -= deltaT * heatLossCoeffWith * timeStep; tempsWithCover.push(Math.max(currentTemp, ambientTemp)); }
+        const finalTempWithout = tempsWithoutCover[tempsWithoutCover.length - 1];
+        const finalTempWith = tempsWithCover[tempsWithCover.length - 1];
+        this.tempWithoutCoverDisplay.textContent = `${finalTempWithout.toFixed(1)}°C`;
+        this.tempWithCoverDisplay.textContent = `${finalTempWith.toFixed(1)}°C`;
+        const energySaved = ((finalTempWith - finalTempWithout) / (initialTemp - ambientTemp)) * 100;
+        this.energySavedDisplay.textContent = `${Math.max(0, energySaved).toFixed(0)}%`;
+        this.draw(tempsWithoutCover, tempsWithCover, hours);
+    }
+    draw(tempsWithoutCover, tempsWithCover, hours) {
+        const width = this.canvas.width; const height = this.canvas.height; const padding = 50;
+        this.ctx.fillStyle = '#1f252f'; this.ctx.fillRect(0, 0, width, height);
+        const maxTemp = Math.max(...tempsWithoutCover, ...tempsWithCover);
+        const minTemp = Math.min(...tempsWithoutCover, ...tempsWithCover);
+        const tempRange = maxTemp - minTemp;
+        this.ctx.strokeStyle = '#2a3140'; this.ctx.lineWidth = 1;
+        for (let i = 0; i <= 5; i++) {
+            const y = padding + (i / 5) * (height - 2 * padding);
+            this.ctx.beginPath(); this.ctx.moveTo(padding, y); this.ctx.lineTo(width - padding, y); this.ctx.stroke();
+            const temp = maxTemp - (i / 5) * tempRange;
+            this.ctx.fillStyle = '#e0d7ef'; this.ctx.font = '11px Inter'; this.ctx.textAlign = 'right';
+            this.ctx.fillText(`${temp.toFixed(1)}°C`, padding - 5, y + 4);
+        }
+        for (let i = 0; i <= 8; i++) {
+            const x = padding + (i / 8) * (width - 2 * padding);
+            this.ctx.fillStyle = '#e0d7ef'; this.ctx.font = '11px Inter'; this.ctx.textAlign = 'center';
+            this.ctx.fillText(`${i}h`, x, height - padding + 20);
+        }
+        this.ctx.strokeStyle = '#EF4444'; this.ctx.lineWidth = 3; this.ctx.beginPath();
+        tempsWithoutCover.forEach((temp, index) => { const x = padding + (index / (tempsWithoutCover.length - 1)) * (width - 2 * padding); const y = padding + ((maxTemp - temp) / tempRange) * (height - 2 * padding); if (index === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); });
+        this.ctx.stroke();
+        this.ctx.strokeStyle = '#10B981'; this.ctx.lineWidth = 3; this.ctx.beginPath();
+        tempsWithCover.forEach((temp, index) => { const x = padding + (index / (tempsWithCover.length - 1)) * (width - 2 * padding); const y = padding + ((maxTemp - temp) / tempRange) * (height - 2 * padding); if (index === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); });
+        this.ctx.stroke();
+        this.ctx.fillStyle = '#EF4444'; this.ctx.fillRect(width - 150, 20, 20, 3);
+        this.ctx.fillStyle = '#e8f1f9'; this.ctx.font = '12px Inter'; this.ctx.textAlign = 'left';
+        this.ctx.fillText('Sem capa térmica', width - 125, 25);
+        this.ctx.fillStyle = '#10B981'; this.ctx.fillRect(width - 150, 40, 20, 3);
+        this.ctx.fillStyle = '#e8f1f9';
+        this.ctx.fillText('Com capa térmica', width - 125, 45);
+        this.ctx.fillStyle = '#e0d7ef'; this.ctx.font = '12px Inter'; this.ctx.textAlign = 'center';
+        this.ctx.fillText('Tempo (horas)', width / 2, height - 10);
+        this.ctx.save(); this.ctx.translate(15, height / 2); this.ctx.rotate(-Math.PI / 2);
+        this.ctx.fillText('Temperatura (°C)', 0, 0); this.ctx.restore();
+    }
+}
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    new AccessibilityManager();
+    new ThemeManager();
+    new ZoomManager();
+    new NavigationManager();
+    new CounterAnimation();
+    new RevealAnimation();
+    new EnergyCalculator();
+    new BlackBodySimulator();
+    new PhotoelectricSimulator();
+    new HeatLossSimulator();
+    console.log('%c🌞 Piscina Solar - Projeto Integrador CEP', 'color: #57449a; font-size: 20px; font-weight: bold;');
+    console.log('%cDesenvolvido por: Matheus V, Luisa A, Joao P, Yasmin M, Uriel H', 'color: #57449a; font-size: 14px;');
+});
+
+if (typeof window !== 'undefined') {
+    window.PiscinaSolar = {
+        AccessibilityManager, ThemeManager, ZoomManager, NavigationManager,
+        CounterAnimation, RevealAnimation, EnergyCalculator,
+        BlackBodySimulator, PhotoelectricSimulator, HeatLossSimulator
+    };
+}
