@@ -2,20 +2,28 @@
  * ============================================
  * PISCINA SOLAR - SCRIPT PRINCIPAL
  * Projeto Integrador CEP - 3º Trimestre 2026
+ * Tema: É possível aquecer a piscina da escola com energia solar?
  * ============================================
  * 
- * Este arquivo contém toda a lógica interativa do site,
- * incluindo simuladores, calculadora, acessibilidade e animações.
+ * Este arquivo contém toda a lógica interativa do site, incluindo:
+ * - Gerenciamento de acessibilidade (temas, VLibras)
+ * - Navegação e scroll suave
+ * - Animações de entrada (Intersection Observer)
+ * - Contadores animados
+ * - Calculadora de dimensionamento energético
+ * - Simulador de Corpo Negro (Lei de Wien e Stefan-Boltzmann)
+ * - Simulador do Efeito Fotoelétrico
+ * - Simulador de Perda Térmica Noturna
  */
 
 // ============================================
-// UTILITÁRIOS GLOBAIS
+// 1. UTILITÁRIOS GLOBAIS
 // ============================================
 
 /**
- * Seleciona um elemento do DOM
+ * Seleciona um único elemento do DOM
  * @param {string} selector - Seletor CSS
- * @returns {HTMLElement}
+ * @returns {HTMLElement|null}
  */
 const $ = (selector) => document.querySelector(selector);
 
@@ -27,9 +35,9 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 
 /**
- * Debounce function para otimizar performance
+ * Função debounce para otimizar performance em eventos de scroll/resize
  * @param {Function} func - Função a ser executada
- * @param {number} wait - Tempo de espera em ms
+ * @param {number} wait - Tempo de espera em milissegundos
  * @returns {Function}
  */
 const debounce = (func, wait) => {
@@ -45,16 +53,16 @@ const debounce = (func, wait) => {
 };
 
 /**
- * Formata número com separadores de milhar
+ * Formata número com separadores de milhar e decimais (padrão pt-BR)
  * @param {number} num - Número a ser formatado
  * @returns {string}
  */
 const formatNumber = (num) => {
-    return num.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+    return num.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
 };
 
 // ============================================
-// PAINEL DE ACESSIBILIDADE
+// 2. GERENCIADOR DE ACESSIBILIDADE
 // ============================================
 
 class AccessibilityManager {
@@ -68,12 +76,12 @@ class AccessibilityManager {
     }
     
     init() {
-        // Aplica tema salvo
+        // Aplica tema salvo no carregamento
         if (this.currentTheme !== 'default') {
             document.documentElement.setAttribute('data-theme', this.currentTheme);
         }
         
-        // Event listeners
+        // Event listeners para o botão toggle
         this.toggle.addEventListener('click', () => this.toggleMenu());
         this.toggle.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -82,10 +90,20 @@ class AccessibilityManager {
             }
         });
         
+        // Event listeners para as opções de tema
         this.options.forEach(option => {
             option.addEventListener('click', () => {
                 const theme = option.getAttribute('data-theme');
                 this.setTheme(theme);
+            });
+            
+            // Suporte a teclado para opções
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const theme = option.getAttribute('data-theme');
+                    this.setTheme(theme);
+                }
             });
         });
         
@@ -96,7 +114,7 @@ class AccessibilityManager {
             }
         });
         
-        // Fecha menu com ESC
+        // Fecha menu com tecla ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.menu.classList.contains('active')) {
                 this.closeMenu();
@@ -118,6 +136,12 @@ class AccessibilityManager {
         this.menu.classList.add('active');
         this.toggle.setAttribute('aria-expanded', 'true');
         this.menu.setAttribute('aria-hidden', 'false');
+        
+        // Foca no primeiro item do menu para acessibilidade por teclado
+        const firstOption = this.menu.querySelector('.a11y-option');
+        if (firstOption) {
+            setTimeout(() => firstOption.focus(), 100);
+        }
     }
     
     closeMenu() {
@@ -137,13 +161,40 @@ class AccessibilityManager {
             this.currentTheme = theme;
         }
         
-        // Feedback visual
+        // Feedback visual e fecha o menu
         this.closeMenu();
+        
+        // Anuncia mudança para leitores de tela (opcional, mas boa prática)
+        this.announceChange(theme);
+    }
+    
+    announceChange(theme) {
+        const announcements = {
+            'high-contrast': 'Modo alto contraste ativado',
+            'dyslexia': 'Fonte para dislexia ativada',
+            'large-text': 'Texto grande ativado',
+            'reduce-motion': 'Animações reduzidas ativadas',
+            'reset': 'Configurações restauradas ao padrão'
+        };
+        
+        if (announcements[theme]) {
+            // Cria um elemento temporário para o screen reader
+            const announcement = document.createElement('div');
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.className = 'sr-only';
+            announcement.textContent = announcements[theme];
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
     }
 }
 
 // ============================================
-// NAVEGAÇÃO E HEADER
+// 3. GERENCIADOR DE NAVEGAÇÃO
 // ============================================
 
 class NavigationManager {
@@ -158,15 +209,15 @@ class NavigationManager {
     }
     
     init() {
-        // Header scroll effect
+        // Efeito de scroll no header
         window.addEventListener('scroll', debounce(() => {
             this.handleScroll();
         }, 100));
         
-        // Mobile menu
+        // Toggle do menu mobile
         this.mobileToggle.addEventListener('click', () => this.toggleMobileMenu());
         
-        // Smooth scroll para links internos
+        // Scroll suave para links internos
         this.navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -207,14 +258,14 @@ class NavigationManager {
     handleScroll() {
         const scrollY = window.scrollY;
         
-        // Header shadow
+        // Adiciona classe scrolled ao header
         if (scrollY > 50) {
             this.header.classList.add('scrolled');
         } else {
             this.header.classList.remove('scrolled');
         }
         
-        // Back to top button
+        // Mostra/esconde botão voltar ao topo
         if (scrollY > 500) {
             this.backToTop.classList.add('visible');
         } else {
@@ -264,7 +315,7 @@ class NavigationManager {
 }
 
 // ============================================
-// ANIMAÇÃO DE CONTADORES
+// 4. ANIMAÇÃO DE CONTADORES
 // ============================================
 
 class CounterAnimation {
@@ -315,15 +366,45 @@ class CounterAnimation {
 }
 
 // ============================================
-// CALCULADORA DE ENERGIA
+// 5. ANIMAÇÃO DE REVEAL (SCROLL)
+// ============================================
+
+class RevealAnimation {
+    constructor() {
+        this.elements = $$('[data-reveal]');
+        this.init();
+    }
+    
+    init() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    // Para de observar após revelar (performance)
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        this.elements.forEach(element => {
+            observer.observe(element);
+        });
+    }
+}
+
+// ============================================
+// 6. CALCULADORA DE ENERGIA
 // ============================================
 
 class EnergyCalculator {
     constructor() {
-        this.form = $('#energyCalculator');
-        this.results = $('#calculatorResults');
+        this.form = $('#energyForm');
+        this.results = $('#calcResults');
         
-        // Constantes físicas
+        // Constantes físicas e econômicas
         this.SPECIFIC_HEAT_WATER = 4.186; // kJ/kg·°C
         this.DENSITY_WATER = 1000; // kg/m³
         this.THERMAL_EFFICIENCY = 0.80; // 80%
@@ -414,14 +495,14 @@ class EnergyCalculator {
     }
     
     displayResults(data) {
-        $('#resultVolume').textContent = formatNumber(data.volume);
-        $('#resultEnergy').textContent = formatNumber(data.energy);
-        $('#resultPower').textContent = formatNumber(data.power);
-        $('#resultThermalArea').textContent = formatNumber(data.thermalArea);
-        $('#resultPVArea').textContent = formatNumber(data.pvArea);
-        $('#resultThermalCost').textContent = formatNumber(data.thermalCost);
-        $('#resultPVCost').textContent = formatNumber(data.pvCost);
-        $('#resultSavings').textContent = formatNumber(data.savings);
+        $('#resVolume').textContent = formatNumber(data.volume);
+        $('#resEnergy').textContent = formatNumber(data.energy);
+        $('#resPower').textContent = formatNumber(data.power);
+        $('#resThermalArea').textContent = formatNumber(data.thermalArea);
+        $('#resPVArea').textContent = formatNumber(data.pvArea);
+        $('#resThermalCost').textContent = formatNumber(data.thermalCost);
+        $('#resPVCost').textContent = formatNumber(data.pvCost);
+        $('#resSavings').textContent = formatNumber(data.savings);
         
         this.results.hidden = false;
         
@@ -433,20 +514,20 @@ class EnergyCalculator {
 }
 
 // ============================================
-// SIMULADOR DE CORPO NEGRO
+// 7. SIMULADOR DE CORPO NEGRO
 // ============================================
 
 class BlackBodySimulator {
     constructor() {
         this.canvas = $('#blackBodyCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.tempSlider = $('#blackBodyTemp');
-        this.tempValue = $('#blackBodyTempValue');
-        this.peakDisplay = $('#blackBodyPeak');
-        this.colorDisplay = $('#blackBodyColor');
-        this.powerDisplay = $('#blackBodyPower');
+        this.tempSlider = $('#bbTemp');
+        this.tempValue = $('#bbTempValue');
+        this.peakDisplay = $('#bbPeak');
+        this.colorDisplay = $('#bbColor');
+        this.powerDisplay = $('#bbPower');
         
-        // Constante de Wien
+        // Constantes físicas
         this.WIEN_CONSTANT = 2898000; // nm·K
         this.STEFAN_BOLTZMANN = 5.67e-8; // W/m²·K⁴
         
@@ -460,15 +541,15 @@ class BlackBodySimulator {
     
     update() {
         const temperature = parseInt(this.tempSlider.value);
-        this.tempValue.textContent = temperature;
+        this.tempValue.textContent = `${temperature} K`;
         
         // Calcula pico de emissão (Lei de Wien)
         const peakWavelength = this.WIEN_CONSTANT / temperature;
-        this.peakDisplay.textContent = peakWavelength.toFixed(0);
+        this.peakDisplay.textContent = `${peakWavelength.toFixed(0)} nm`;
         
         // Calcula potência emitida (Lei de Stefan-Boltzmann)
         const power = this.STEFAN_BOLTZMANN * Math.pow(temperature, 4);
-        this.powerDisplay.textContent = formatNumber(power);
+        this.powerDisplay.textContent = `${formatNumber(power)} W/m²`;
         
         // Determina cor predominante
         const color = this.wavelengthToColor(peakWavelength);
@@ -535,7 +616,7 @@ class BlackBodySimulator {
         const height = this.canvas.height;
         
         // Limpa canvas
-        this.ctx.fillStyle = '#111827';
+        this.ctx.fillStyle = '#1f252f';
         this.ctx.fillRect(0, 0, width, height);
         
         // Desenha espectro de fundo
@@ -585,13 +666,13 @@ class BlackBodySimulator {
         this.ctx.fill();
         
         // Label do pico
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = '#e8f1f9';
         this.ctx.font = '14px Inter';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`λ_max = ${peakWavelength.toFixed(0)} nm`, peakX, peakY - 15);
         
         // Labels dos eixos
-        this.ctx.fillStyle = '#9CA3AF';
+        this.ctx.fillStyle = '#e0d7ef';
         this.ctx.font = '12px Inter';
         this.ctx.textAlign = 'left';
         this.ctx.fillText('Comprimento de onda (nm)', 10, height - 10);
@@ -615,20 +696,19 @@ class BlackBodySimulator {
 }
 
 // ============================================
-// SIMULADOR DO EFEITO FOTOELÉTRICO
+// 8. SIMULADOR DO EFEITO FOTOELÉTRICO
 // ============================================
 
 class PhotoelectricSimulator {
     constructor() {
         this.canvas = $('#photoelectricCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.freqSlider = $('#lightFrequency');
-        this.freqValue = $('#lightFrequencyValue');
-        this.intensitySlider = $('#lightIntensity');
-        this.intensityValue = $('#lightIntensityValue');
-        this.photonEnergyDisplay = $('#photonEnergy');
-        this.electronsDisplay = $('#electronsEjected');
-        this.statusDisplay = $('#photoelectricStatus');
+        this.freqSlider = $('#peFreq');
+        this.freqValue = $('#peFreqValue');
+        this.intensitySlider = $('#peIntensity');
+        this.intensityValue = $('#peIntensityValue');
+        this.photonEnergyDisplay = $('#peEnergy');
+        this.statusDisplay = $('#peStatus');
         
         // Constantes
         this.PLANCK_CONSTANT = 4.136e-15; // eV·s
@@ -652,24 +732,21 @@ class PhotoelectricSimulator {
         const frequency = parseFloat(this.freqSlider.value);
         const intensity = parseInt(this.intensitySlider.value);
         
-        this.freqValue.textContent = frequency.toFixed(1);
-        this.intensityValue.textContent = intensity;
+        this.freqValue.textContent = `${frequency.toFixed(1)} × 10¹⁴ Hz`;
+        this.intensityValue.textContent = `${intensity}%`;
         
         // Calcula energia do fóton (E = hf)
         const photonEnergy = this.PLANCK_CONSTANT * frequency * 1e14;
-        this.photonEnergyDisplay.textContent = photonEnergy.toFixed(2);
+        this.photonEnergyDisplay.textContent = `${photonEnergy.toFixed(2)} eV`;
         
         // Verifica se há emissão de elétrons
         const canEmit = photonEnergy > this.WORK_FUNCTION;
         
         if (canEmit) {
             const kineticEnergy = photonEnergy - this.WORK_FUNCTION;
-            const electronCount = Math.floor(intensity / 10);
-            this.electronsDisplay.textContent = electronCount;
             this.statusDisplay.textContent = `Emitindo! Ec = ${kineticEnergy.toFixed(2)} eV`;
             this.statusDisplay.style.color = '#10B981';
         } else {
-            this.electronsDisplay.textContent = '0';
             this.statusDisplay.textContent = 'Sem emissão (energia insuficiente)';
             this.statusDisplay.style.color = '#EF4444';
         }
@@ -692,7 +769,7 @@ class PhotoelectricSimulator {
             }
         }
         
-        // Limita quantidade de partículas
+        // Limita quantidade de partículas para performance
         if (this.photons.length > 50) {
             this.photons = this.photons.slice(-50);
         }
@@ -707,18 +784,18 @@ class PhotoelectricSimulator {
         const height = this.canvas.height;
         
         // Limpa canvas
-        this.ctx.fillStyle = '#111827';
+        this.ctx.fillStyle = '#1f252f';
         this.ctx.fillRect(0, 0, width, height);
         
         // Desenha placa metálica
-        this.ctx.fillStyle = '#6B7280';
+        this.ctx.fillStyle = '#57449a';
         this.ctx.fillRect(250, 80, 20, 140);
         
         // Desenha coletor
-        this.ctx.fillStyle = '#9CA3AF';
+        this.ctx.fillStyle = '#e0d7ef';
         this.ctx.fillRect(400, 80, 20, 140);
         
-        // Desnota fonte de luz
+        // Desenha fonte de luz
         const frequency = parseFloat(this.freqSlider.value);
         const color = this.frequencyToColor(frequency);
         this.ctx.fillStyle = color;
@@ -730,7 +807,7 @@ class PhotoelectricSimulator {
         this.photons.forEach((photon, index) => {
             photon.x += photon.speed;
             
-            // Desnota fóton
+            // Desenha fóton
             this.ctx.fillStyle = color;
             this.ctx.beginPath();
             this.ctx.arc(photon.x, photon.y, 4, 0, Math.PI * 2);
@@ -758,7 +835,7 @@ class PhotoelectricSimulator {
             electron.x += electron.speed;
             electron.life--;
             
-            // Desnota elétron
+            // Desenha elétron
             this.ctx.fillStyle = '#10B981';
             this.ctx.beginPath();
             this.ctx.arc(electron.x, electron.y, 5, 0, Math.PI * 2);
@@ -771,7 +848,7 @@ class PhotoelectricSimulator {
         });
         
         // Labels
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = '#e8f1f9';
         this.ctx.font = '12px Inter';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Fonte de Luz', 50, 200);
@@ -796,21 +873,21 @@ class PhotoelectricSimulator {
 }
 
 // ============================================
-// SIMULADOR DE PERDA TÉRMICA
+// 9. SIMULADOR DE PERDA TÉRMICA
 // ============================================
 
 class HeatLossSimulator {
     constructor() {
         this.canvas = $('#heatLossCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.initialTempSlider = $('#initialWaterTemp');
-        this.initialTempValue = $('#initialWaterTempValue');
-        this.ambientTempSlider = $('#ambientTemp');
-        this.ambientTempValue = $('#ambientTempValue');
-        this.thermalCoverCheckbox = $('#thermalCover');
-        this.tempWithoutCoverDisplay = $('#tempWithoutCover');
-        this.tempWithCoverDisplay = $('#tempWithCover');
-        this.energySavedDisplay = $('#energySaved');
+        this.initialTempSlider = $('#hlInitial');
+        this.initialTempValue = $('#hlInitialValue');
+        this.ambientTempSlider = $('#hlAmbient');
+        this.ambientTempValue = $('#hlAmbientValue');
+        this.thermalCoverCheckbox = $('#hlCover');
+        this.tempWithoutCoverDisplay = $('#hlWithout');
+        this.tempWithCoverDisplay = $('#hlWith');
+        this.energySavedDisplay = $('#hlSaved');
         
         this.init();
     }
@@ -827,8 +904,8 @@ class HeatLossSimulator {
         const ambientTemp = parseFloat(this.ambientTempSlider.value);
         const useCover = this.thermalCoverCheckbox.checked;
         
-        this.initialTempValue.textContent = initialTemp;
-        this.ambientTempValue.textContent = ambientTemp;
+        this.initialTempValue.textContent = `${initialTemp}°C`;
+        this.ambientTempValue.textContent = `${ambientTemp}°C`;
         
         // Simula perda de temperatura ao longo de 8 horas
         const hours = 8;
@@ -862,11 +939,11 @@ class HeatLossSimulator {
         const finalTempWithout = tempsWithoutCover[tempsWithoutCover.length - 1];
         const finalTempWith = tempsWithCover[tempsWithCover.length - 1];
         
-        this.tempWithoutCoverDisplay.textContent = finalTempWithout.toFixed(1);
-        this.tempWithCoverDisplay.textContent = finalTempWith.toFixed(1);
+        this.tempWithoutCoverDisplay.textContent = `${finalTempWithout.toFixed(1)}°C`;
+        this.tempWithCoverDisplay.textContent = `${finalTempWith.toFixed(1)}°C`;
         
         const energySaved = ((finalTempWith - finalTempWithout) / (initialTemp - ambientTemp)) * 100;
-        this.energySavedDisplay.textContent = Math.max(0, energySaved).toFixed(0);
+        this.energySavedDisplay.textContent = `${Math.max(0, energySaved).toFixed(0)}%`;
         
         // Desenha gráfico
         this.draw(tempsWithoutCover, tempsWithCover, hours);
@@ -878,7 +955,7 @@ class HeatLossSimulator {
         const padding = 50;
         
         // Limpa canvas
-        this.ctx.fillStyle = '#111827';
+        this.ctx.fillStyle = '#1f252f';
         this.ctx.fillRect(0, 0, width, height);
         
         // Calcula escala
@@ -886,8 +963,8 @@ class HeatLossSimulator {
         const minTemp = Math.min(...tempsWithoutCover, ...tempsWithCover);
         const tempRange = maxTemp - minTemp;
         
-        // Desnota grade
-        this.ctx.strokeStyle = '#374151';
+        // Desenha grade
+        this.ctx.strokeStyle = '#2a3140';
         this.ctx.lineWidth = 1;
         
         for (let i = 0; i <= 5; i++) {
@@ -899,7 +976,7 @@ class HeatLossSimulator {
             
             // Labels de temperatura
             const temp = maxTemp - (i / 5) * tempRange;
-            this.ctx.fillStyle = '#9CA3AF';
+            this.ctx.fillStyle = '#e0d7ef';
             this.ctx.font = '11px Inter';
             this.ctx.textAlign = 'right';
             this.ctx.fillText(`${temp.toFixed(1)}°C`, padding - 5, y + 4);
@@ -908,13 +985,13 @@ class HeatLossSimulator {
         // Labels de tempo
         for (let i = 0; i <= 8; i++) {
             const x = padding + (i / 8) * (width - 2 * padding);
-            this.ctx.fillStyle = '#9CA3AF';
+            this.ctx.fillStyle = '#e0d7ef';
             this.ctx.font = '11px Inter';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(`${i}h`, x, height - padding + 20);
         }
         
-        // Desnota curva sem capa
+        // Desenha curva sem capa
         this.ctx.strokeStyle = '#EF4444';
         this.ctx.lineWidth = 3;
         this.ctx.beginPath();
@@ -932,7 +1009,7 @@ class HeatLossSimulator {
         
         this.ctx.stroke();
         
-        // Desnota curva com capa
+        // Desenha curva com capa
         this.ctx.strokeStyle = '#10B981';
         this.ctx.lineWidth = 3;
         this.ctx.beginPath();
@@ -953,18 +1030,18 @@ class HeatLossSimulator {
         // Legenda
         this.ctx.fillStyle = '#EF4444';
         this.ctx.fillRect(width - 150, 20, 20, 3);
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = '#e8f1f9';
         this.ctx.font = '12px Inter';
         this.ctx.textAlign = 'left';
         this.ctx.fillText('Sem capa térmica', width - 125, 25);
         
         this.ctx.fillStyle = '#10B981';
         this.ctx.fillRect(width - 150, 40, 20, 3);
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = '#e8f1f9';
         this.ctx.fillText('Com capa térmica', width - 125, 45);
         
         // Labels dos eixos
-        this.ctx.fillStyle = '#9CA3AF';
+        this.ctx.fillStyle = '#e0d7ef';
         this.ctx.font = '12px Inter';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Tempo (horas)', width / 2, height - 10);
@@ -978,7 +1055,7 @@ class HeatLossSimulator {
 }
 
 // ============================================
-// INICIALIZAÇÃO
+// 10. INICIALIZAÇÃO GLOBAL
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -986,43 +1063,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const a11yManager = new AccessibilityManager();
     const navManager = new NavigationManager();
     const counterAnimation = new CounterAnimation();
+    const revealAnimation = new RevealAnimation();
     const energyCalculator = new EnergyCalculator();
     const blackBodySim = new BlackBodySimulator();
     const photoelectricSim = new PhotoelectricSimulator();
     const heatLossSim = new HeatLossSimulator();
     
-    // Animação de entrada para elementos
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in-up');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-    
-    // Observa seções para animação
-    const sections = $$('section');
-    sections.forEach(section => {
-        observer.observe(section);
-    });
-    
-    // Console message
-    console.log('%c🌞 Piscina Solar - Projeto Integrador CEP', 'color: #6B21A8; font-size: 20px; font-weight: bold;');
-    console.log('%cDesenvolvido por: Matheus V, Luisa A, Joao P, Yasmin M, Uriel H', 'color: #9333EA; font-size: 14px;');
-    console.log('%c3º Trimestre 2026', 'color: #C084FC; font-size: 12px;');
+    // Mensagem no console para desenvolvedores
+    console.log('%c🌞 Piscina Solar - Projeto Integrador CEP', 'color: #57449a; font-size: 20px; font-weight: bold;');
+    console.log('%cTema: É possível aquecer a piscina da escola com energia solar?', 'color: #57449a; font-size: 14px;');
+    console.log('%cDesenvolvido por: Matheus V, Luisa A, Joao P, Yasmin M, Uriel H', 'color: #57449a; font-size: 14px;');
+    console.log('%c3º Trimestre 2026', 'color: #57449a; font-size: 12px;');
 });
 
-// Exporta para uso global (se necessário)
+// Exporta para uso global (se necessário para debug)
 if (typeof window !== 'undefined') {
     window.PiscinaSolar = {
         AccessibilityManager,
         NavigationManager,
+        CounterAnimation,
+        RevealAnimation,
         EnergyCalculator,
         BlackBodySimulator,
         PhotoelectricSimulator,
